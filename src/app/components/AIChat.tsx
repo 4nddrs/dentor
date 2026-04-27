@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Bot, X, Maximize2, Send } from 'lucide-react';
+import { Bot, X, Maximize2, Minimize2, Send } from 'lucide-react';
 
 interface Message {
   type: 'bot' | 'user';
@@ -9,6 +9,7 @@ interface Message {
 
 export function AIChat() {
   const [isOpen, setIsOpen] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [isTyping, setIsTyping] = useState(true);
   const [messages, setMessages] = useState<Message[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(true);
@@ -115,7 +116,13 @@ export function AIChat() {
   }
 
   return (
-    <div className="fixed bottom-4 right-4 md:bottom-6 md:right-6 w-[calc(100vw-2rem)] sm:w-96 max-w-[calc(100vw-2rem)] bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden z-50">
+    <div
+      className={`fixed z-50 overflow-hidden bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col transition-all duration-300 ${
+        isExpanded
+          ? 'inset-4 md:inset-6'
+          : 'bottom-4 right-4 md:bottom-6 md:right-6 w-[calc(100vw-2rem)] sm:w-96 max-w-[calc(100vw-2rem)]'
+      }`}
+    >
       <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
@@ -127,8 +134,16 @@ export function AIChat() {
           </div>
         </div>
         <div className="flex gap-2">
-          <button className="p-1 hover:bg-white/10 rounded transition-colors">
-            <Maximize2 className="w-4 h-4 text-white" />
+          <button
+            onClick={() => setIsExpanded(prev => !prev)}
+            aria-label={isExpanded ? 'Reducir chat' : 'Ampliar chat'}
+            className="p-1 hover:bg-white/10 rounded transition-colors"
+          >
+            {isExpanded ? (
+              <Minimize2 className="w-4 h-4 text-white" />
+            ) : (
+              <Maximize2 className="w-4 h-4 text-white" />
+            )}
           </button>
           <button
             onClick={() => setIsOpen(false)}
@@ -139,7 +154,11 @@ export function AIChat() {
         </div>
       </div>
 
-      <div className="p-4 max-h-96 overflow-y-auto space-y-3">
+      <div
+        className={`p-4 space-y-3 overflow-y-auto ${
+          isExpanded ? 'flex-1 min-h-0' : 'max-h-96'
+        }`}
+      >
         {messages.map((message, idx) => (
           <div
             key={idx}
